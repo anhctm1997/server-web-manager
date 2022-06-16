@@ -14,11 +14,11 @@ export class UserRoutes extends CommonRoutesConfig {
   configureRoutes() {
     this.app
       .route(`/servers`)
-      .get(serversController.listUsers)
+      .get(serversController.listServers)
       .post(
         serversMiddleware.validReqServerBodyFields,
         serversMiddleware.validSameServerDoesntExist,
-        serversController.createUser
+        serversController.createServer
       );
 
     this.app.param(`serverId`, serversMiddleware.extractServerId);

@@ -1,10 +1,10 @@
 import express from "express";
-import { PermissionLevel } from "./common.permissionslevel.type";
+import { Permissions } from "./common.permissionslevel.type";
 import messageStatus from "../../configs/constant/messageStatus";
 import debug from "debug";
 const log: debug.IDebugger = debug("app:common-permission-middleware");
 class CommonPermissionsMiddlewares {
-  memberPermissionLevelRequire(requiredPermissionLevel: PermissionLevel) {
+  memberPermissionLevelRequire(requiredPermissionLevel: Permissions) {
     return (
       req: express.Request,
       res: express.Response,
@@ -35,7 +35,7 @@ class CommonPermissionsMiddlewares {
     ) {
       return next();
     } else {
-      if (userPermissionLevel & PermissionLevel.ADMIN_PERMISSION) {
+      if (userPermissionLevel & Permissions.ADMIN_PERMISSION) {
         return next();
       } else {
         return res.status(403).json(messageStatus(403));
@@ -48,7 +48,7 @@ class CommonPermissionsMiddlewares {
     next: express.NextFunction
   ) {
     const userPermissionLevel = parseInt(res.locals.jwt.permissionLevel);
-    if (userPermissionLevel & PermissionLevel.ADMIN_PERMISSION) {
+    if (userPermissionLevel & Permissions.ADMIN_PERMISSION) {
       return next();
     } else {
       return res.status(403).json(messageStatus(403));

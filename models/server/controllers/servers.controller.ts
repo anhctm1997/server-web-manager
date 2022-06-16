@@ -15,7 +15,7 @@ class ServersController {
     const server = await serversService.readById(req.params.serverId);
     res.status(200).json(server);
   }
-  async createUser(req: express.Request, res: express.Response) {
+  async createServer(req: express.Request, res: express.Response) {
     req.body.password = await argon2.hash(req.body.password);
     const serverId = await serversService.create(req.body);
     res.status(201).json(messageStatus(200));
@@ -32,7 +32,7 @@ class ServersController {
     log(await serversService.putById(req.params.userId, req.body));
     res.status(204).json(messageStatus(200));
   }
-  async removeUser(req: express.Request, res: express.Response) {
+  async removeServer(req: express.Request, res: express.Response) {
     log(await serversService.deleteById(req.params.userId));
     res.status(204).json(messageStatus(200));
   }
