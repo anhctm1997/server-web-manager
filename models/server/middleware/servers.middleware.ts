@@ -1,45 +1,43 @@
 import express from "express";
 import messageStatus from "../../../configs/constant/messageStatus";
-import userService from "../services/users.service";
-class UsersMiddleware {
-  async validReqUserBodyFields(
+import serverService from "../services/servers.service";
+class ServersMiddleware {
+  async validReqServerBodyFields(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
-    if (req.body && req.body.username && req.body.password) {
+    if (req.body) {
       next();
     } else {
       res
         .status(400)
-        .json(
-          messageStatus(400, "Missing required fields: email and password")
-        );
+        .json(messageStatus(400, "Missing required fields: Server infomation"));
     }
   }
-  async validSameUserDoesntExist(
+  async validSameServerDoesntExist(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
-    const user = await userService.getUserByUsername(req.body.username);
+    const user = await serverService.getServerByName(req.body.name);
     if (user) {
-      res.status(400).json(messageStatus(400, "User username already exists"));
+      res.status(400).json(messageStatus(400, "Server name already exists"));
     } else {
       next();
     }
   }
-  async validSameUsernameBelongToSameUser(
+  async validSameNameBelongToSameServerID(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
-    const user = await userService.getUserByUsername(req.body.username);
-    if (user && user.id === req.params.userId) {
-      res.locals.user = user;
+    const server = await serverService.getServerByName(req.body.name);
+    if (server && server.id === req.params.serverId) {
+      res.locals.server = server;
       next();
     } else {
-      res.status(400).json(messageStatus(400, "Invalid email"));
+      res.status(400).json(messageStatus(400, "Invalid Server Name"));
     }
   }
   async userCantChangePermission(
@@ -55,13 +53,13 @@ class UsersMiddleware {
       next();
     }
   }
-  async validateUserExists(
+  async validateServerExists(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
-    const user = await userService.readById(req.params.userId);
-    if (user) {
+    const server = await serverService.readById(req.params.serverId);
+    if (server) {
       next();
     } else {
       res
@@ -69,14 +67,14 @@ class UsersMiddleware {
         .json(messageStatus(400, `User ${req.params.userId} not found`));
     }
   }
-  async extractUserId(
+  async extractServerId(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
-    req.body.id = req.params.userId;
+    req.body.id = req.params.serverId;
     next();
   }
 }
 
-export default new UsersMiddleware();
+export default new ServersMiddleware();
