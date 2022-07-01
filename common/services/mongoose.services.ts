@@ -8,7 +8,6 @@ class MongooseServices {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     serverSelectionTimeoutMS: 5000,
-    useFindAndModify: false,
   };
   constructor() {
     this.connectWithRetry();
@@ -17,22 +16,19 @@ class MongooseServices {
   getMongoose() {
     return mongoose;
   }
-  connectWithRetry = () => {
-    log("Attempting MongoDB connection (will retry if needed)");
-    mongoose
-      .connect(key.uri || "", this.mongooseOptions)
-      .then(() => {
-        log("MongoDB is connected");
-      })
-      .catch((err) => {
-        const retrySeconds = 5;
-        log(
-          `MongoDB connection unsuccessful (will retry #${++this
-            .count} after ${retrySeconds} seconds):`,
-          err
-        );
-        setTimeout(this.connectWithRetry, retrySeconds * 1000);
-      });
+  connectWithRetry = async () => {
+    try {
+      await mongoose.connect(key.uri, this.mongooseOptions);
+      console.log("MongoDB is connected");
+    } catch (err) {
+      const retrySeconds = 5;
+      console.log(
+        `MongoDB connection unsuccessful (will retry #${++this
+          .count} after ${retrySeconds} seconds):`,
+        err
+      );
+      setTimeout(this.connectWithRetry, retrySeconds * 1000);
+    }
   };
 }
 

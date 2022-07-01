@@ -8,7 +8,7 @@ const log: debug.IDebugger = debug("app:users-controller");
 
 class UsersController {
   async listUsers(req: express.Request, res: express.Response) {
-    const listUsers = await usersService.list(100, 0);
+    const listUsers = await usersService.list(req.query.limit, req.query.page);
     res.status(200).json(listUsers);
   }
   async getUserById(req: express.Request, res: express.Response) {
@@ -16,9 +16,10 @@ class UsersController {
     res.status(200).json(user);
   }
   async createUser(req: express.Request, res: express.Response) {
+    //console.log(req.body);
     req.body.password = await argon2.hash(req.body.password);
     const userId = await usersService.create(req.body);
-    res.status(201).json(messageStatus(200));
+    res.status(201).json(messageStatus(200, "Created"));
   }
   async patch(req: express.Request, res: express.Response) {
     if (req.body.password) {
@@ -38,7 +39,7 @@ class UsersController {
   }
   async updatePermissions(req: express.Request, res: express.Response) {
     const patchUserDto: PatchUserDto = {
-      permissions: parseInt(req.params.permissions),
+      isAdmin: parseInt(req.params.isAdmin),
     };
     log(await usersService.patchById(req.params.userId, patchUserDto));
     res.status(204).json(messageStatus(200));

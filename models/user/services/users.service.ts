@@ -6,13 +6,13 @@ import { PatchUserDto } from "../dto/patch.user.dto";
 
 class UsersService implements CRUD {
   async create(resource: CreateUserDto) {
-    resource.permissions = 1;
+    resource.isAdmin = 1;
     return UsersDao.addUser(resource);
   }
   async deleteById(id: string) {
     return UsersDao.removeUserById(id);
   }
-  async list(limit: number, page: number) {
+  async list(limit, page) {
     return UsersDao.getUsers(limit, page);
   }
   async patchById(id: string, resource: PatchUserDto): Promise<any> {

@@ -16,8 +16,9 @@ class AuthController {
         .update(refreshId)
         .digest("base64");
       req.body.refreshKey = salt.export();
-      const token = jwt.sign(req.body, jwtSecret, key.expTime(30));
+      const token = jwt.sign(req.body, jwtSecret, key.expTime(1));
       return res.status(201).json({
+        username: req.body.username,
         accessToken: token,
         refreshToken: hash,
       });

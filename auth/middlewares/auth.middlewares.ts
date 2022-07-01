@@ -14,29 +14,36 @@ class AuthMiddleware {
       res.status(400).json(messageStatus(400));
     }
   }
-  async validateUserPassword(
+  async validateIsAdmin(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    if (req.body.isAdmin === 1) next();
+    res.status(403).json(messageStatus(403, "You not a admin"));
+  }
+  async verifyUserPassword(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
     const user: any = await usersService.getUserByUsernameWithPassword(
-      req.body.email
+      req.body.username
     );
     if (user) {
-      const passwordHash = user.password;
-      if (await argon2.verify(passwordHash, req.body.password)) {
+      const passwordHashed = user.password;
+      if (await argon2.verify(passwordHashed, req.body.password)) {
         req.body = {
-          userId: user._id,
+          _id: user._id,
           username: user.username,
-          provider: "username",
-          permissions: user.permissions,
+          isAdmin: user.isAdmin,
         };
         return next();
       } else {
-        res.status(400).json(messageStatus(400));
+        res.status(404).json(messageStatus(404, "Password not macth"));
       }
     } else {
-      res.status(400).json(messageStatus(400));
+      res.status(404).json(messageStatus(404, "Username not found"));
     }
   }
 }

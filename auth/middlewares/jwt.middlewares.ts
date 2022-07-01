@@ -9,7 +9,7 @@ import usersService from "../../models/user/services/users.service";
 const jwtSecret: string = key.jwt || "";
 
 class JwtMiddlewares {
-  verifyResfreshBodyField(
+  verifyRefreshBodyField(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction

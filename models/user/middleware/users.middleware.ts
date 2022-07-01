@@ -13,7 +13,7 @@ class UsersMiddleware {
       res
         .status(400)
         .json(
-          messageStatus(400, "Missing required fields: email and password")
+          messageStatus(400, "Missing required fields: username and password")
         );
     }
   }
@@ -47,7 +47,7 @@ class UsersMiddleware {
     res: express.Response,
     next: express.NextFunction
   ) {
-    if (res.locals.user.permissions !== req.body.permissions) {
+    if (res.locals.user.isAdmin !== req.body.isAdmin) {
       res
         .status(403)
         .json(messageStatus(403, "User cannot change permission level"));
