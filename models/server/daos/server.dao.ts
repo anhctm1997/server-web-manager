@@ -64,7 +64,7 @@ class ServersDao {
   }
   async getServerByIdWithPassword(serverid: string) {
     return this.Server.findOne({ _id: serverid })
-      .select("_id servername permissions +password")
+      .select("_id name ip +password")
       .exec();
   }
   async removeServerById(serverId: string) {

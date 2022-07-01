@@ -1,12 +1,14 @@
 import express from "express";
-import { CommonRoutesConfig } from "../../auth/auth.routes";
+import { CommonRoutesConfig } from "../../common/common.routes.config";
 import jwtMiddlewares from "../../auth/middlewares/jwt.middlewares";
 import commonPermissionsMiddlewares from "../../common/middlewares/common.permissions.middlewares";
-import { Permissions } from "../../common/middlewares/common.permissionslevel.type";
+import { IsAdmin } from "../../common/middlewares/common.permissionslevel.type";
+import AuthController from "../../auth/controllers/auth.controller";
+import AuthMiddlewares from "../../auth/middlewares/auth.middlewares";
 import BodyValidationMiddleware from "../../common/middlewares/body.validation.middlewares";
 import { body } from "express-validator";
-import usersController from "./controllers/users.controller";
-import usersMiddleware from "./middleware/users.middleware";
+import UsersController from "./controllers/users.controller";
+import UsersMiddleware from "./middleware/users.middleware";
 export class UserRoutes extends CommonRoutesConfig {
   constructor(app: express.Application) {
     super(app, "UserRoutes");
@@ -14,24 +16,24 @@ export class UserRoutes extends CommonRoutesConfig {
   configureRoutes() {
     this.app
       .route(`/users`)
-      .get(usersController.listUsers)
+      .all(jwtMiddlewares.validJWTNeeded)
+      .get(UsersController.listUsers)
       .post(
-        usersMiddleware.validReqUserBodyFields,
-        usersMiddleware.validSameUserDoesntExist,
-        usersController.createUser
+        UsersMiddleware.validReqUserBodyFields,
+        UsersMiddleware.validSameUserDoesntExist,
+        UsersController.createUser
       );
-
-    this.app.param(`userId`, usersMiddleware.extractUserId);
+    this.app.param(`userId`, UsersMiddleware.extractUserId);
     this.app
       .route(`/users/:userId`)
-      .all(usersMiddleware.validateUserExists)
-      .get(usersController.getUserById)
-      .delete(usersController.removeUser);
+      .all(UsersMiddleware.validateUserExists)
+      .get(UsersController.getUserById)
+      .delete(UsersController.removeUser);
 
     this.app.put(`/users/:userId`, [
-      usersMiddleware.validReqUserBodyFields,
-      usersMiddleware.validSameUsernameBelongToSameUser,
-      usersController.put,
+      UsersMiddleware.validReqUserBodyFields,
+      UsersMiddleware.validSameUsernameBelongToSameUser,
+      UsersController.put,
     ]);
 
     return this.app;
